@@ -1,20 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define INPUT_FILE "inputs/day1.txt"
 const int STARTING_DIAL = 50;
 
-// int main() {
-//     int test;
-
-//     test = -14 / 5;
-//     printf("Test: %d", test);
-// }
-
-int main() {
-    printf("Hello Advent of Code 2025!\n");
-    
-    // Example: Read from file
+int main() {    
     FILE *file = fopen("./inputs/day1.txt", "r");
     if (file == NULL) {
         printf("Could not open input file\n");
