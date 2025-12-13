@@ -48,7 +48,7 @@ int main() {
             for (int i = 0; i < range_count; i++) {
                 if (cur_num >= ranges[i].start && cur_num <= ranges[i].end) {
                     fresh_count++;
-                    printf("Fresh!");
+                    printf(" Fresh!");
                     break;
                 } 
             }
