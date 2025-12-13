@@ -29,25 +29,27 @@ int main() {
     rewind(file);
     
     // Dynamically allocate 2D array
-    int **map = malloc(num_rows * sizeof(int *));
-    for (int i = 0; i < num_rows; i++) {
-        map[i] = malloc(num_cols * sizeof(int));
+    int **map = malloc((num_rows+2) * sizeof(int *));
+    for (int i = 0; i < num_rows+2; i++) {
+        map[i] = malloc((num_cols+2) * sizeof(int));
     }
     
-    // Initialize all to 0
-    for (int i = 0; i < num_rows; i++) {
-        for (int j = 0; j < num_cols; j++) {
+    // Create an empty layer of padding to make sure we don't go out-of-bounds when checking neighbours later.
+    // Initialize all to 0: edges donot count as rolls.
+    for (int i = 0; i < num_rows+2; i++) {
+        for (int j = 0; j < num_cols+2; j++) {
             map[i][j] = 0;
         }
     }
 
     // Second pass: populate the array
-    int cur_row = 0;
+    // We start at row 1 because first row is a empty buffer row
+    int cur_row = 1;
     while (fgets(line, sizeof(line), file)) {
         line[strcspn(line, "\n")] = '\0';
         
-        for (int cur_col = 0; cur_col < num_cols; cur_col++) {
-            if (line[cur_col] == '@') {
+        for (int cur_col = 1; cur_col < num_cols+1; cur_col++) {
+            if (line[cur_col-1] == '@') {
                 map[cur_row][cur_col] = 1;
             }
         }
@@ -57,42 +59,20 @@ int main() {
     
     int accessible_rolls = 0;
     // Print the map
-    for (int cur_row = 0; cur_row < num_rows; cur_row++) {
-        for (int cur_col = 0; cur_col < num_cols; cur_col++) {
-            int adjacent_roll_count = 0;
+    for (int cur_row = 1; cur_row < num_rows+1; cur_row++) {
+        for (int cur_col = 1; cur_col < num_cols+1; cur_col++) {
+            int adjacent_roll_count;
+            // printf("%d",map[cur_row][cur_col]);
             if (map[cur_row][cur_col] == 1) {
-                if (cur_col + 1 < num_cols && map[cur_row][cur_col+1] == 1){
-                    adjacent_roll_count++;
-                    // printf("a");
-                }
-                if (cur_col - 1 >= 0 && map[cur_row][cur_col-1] == 1) {
-                    adjacent_roll_count++;
-                    // printf("b");
-                }
-                if (cur_row + 1 < num_rows && map[cur_row+1][cur_col] == 1) {
-                    adjacent_roll_count++;
-                    // printf("c");
-                }
-                if (cur_row - 1 >= 0 && map[cur_row-1][cur_col] == 1) {
-                    adjacent_roll_count++;
-                    // printf("d");
-                }
-                if (cur_row + 1 < num_rows && cur_col + 1 < num_cols && map[cur_row+1][cur_col+1] == 1) {
-                    adjacent_roll_count++;
-                    // printf("e");
-                }
-                if (cur_row - 1 >= 0 && cur_col + 1 < num_cols && map[cur_row-1][cur_col+1] == 1) {
-                    adjacent_roll_count++;
-                    // printf("f");
-                }
-                if (cur_row + 1 < num_rows && cur_col -1 >= 0 && map[cur_row+1][cur_col-1] == 1) {
-                    adjacent_roll_count++;
-                    // printf("g");
-                }
-                if (cur_row - 1 >= 0 && cur_col - 1 >= 0 && map[cur_row-1][cur_col-1] == 1) {
-                    adjacent_roll_count++;
-                    // printf("h");
-                } 
+                adjacent_roll_count = map[cur_row+1][cur_col] 
+                                    + map[cur_row+1][cur_col+1] 
+                                    + map[cur_row][cur_col+1] 
+                                    + map[cur_row-1][cur_col+1] 
+                                    + map[cur_row-1][cur_col] 
+                                    + map[cur_row-1][cur_col-1] 
+                                    + map[cur_row][cur_col-1] 
+                                    + map[cur_row+1][cur_col-1];
+
                 if (adjacent_roll_count < 4) {
                     accessible_rolls++;
                     printf("x");
